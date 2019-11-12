@@ -39,11 +39,16 @@ void split(char chs[1000], int len){
 	type 2: functions
 	type 3: operators
 	type 4: numbers
+	type 5: constants
 	*/
 	int i, index = -1, chs_i = 0, type = 0, changed = 0;
 	for(i = 0; i < len; i++){
+		if(chs[i] == ' ')
+			continue;
+			
 		changed = 0;
 		
+		// parantheses
 		if(chs[i] == 40 || chs[i] == 41){
 			type = 1;
 			index++;
@@ -55,16 +60,28 @@ void split(char chs[1000], int len){
 			tok[index]->type = type;
 			continue;	
 		}
+		// constant
+		if(chs[i] == 'e' || (chs[i] == 'p' || (chs[i] == 'i' && type == 5))){
+			if(type != 5){
+				type = 5;
+				changed = 1;
+				printf("const\n");
+
+			}
+		}
+		// function
 		if(chs[i] >= 97 && chs[i] <=122)
-			if(type != 2){
+			if(type != 2 && type != 5){
 				type = 2;
 				changed = 1;
 			}
+		// operator
 		if(chs[i] == 42 || chs[i] == 43 || chs[i] == 45 || chs[i] == 47)
 			if(type != 3){
 				type = 3;
 				changed = 1;
 			}
+		// numbers
 		if(chs[i] >= 48 && chs[i] <=57 || chs[i] == 46)
 			if(type != 4){
 				type = 4;
@@ -180,11 +197,9 @@ tk_tree* parser(int s_p, int f_p){
 				j++;
 				
 			}
-			
-			//j--;
+			if(j != f_p - 1)
+				j--;
 				
-				
-
 			tk_tree* new_top;
 			printf("2)i %d j %d\n", i+1,j);
 			
@@ -217,8 +232,24 @@ tk_tree* parser(int s_p, int f_p){
 		}
 		
 		if(bgng){
+			// constant
+			if(tok[i]->type == 5){
+				printf("bgng const\n");
+				top = new_tkt_cell();
+				tt = top;
+				top->left = new_tkt_cell();
+				
+				for(k = 0; k<tok[i]->len; k++){
+					top->left->chars[k] = tok[i]->chars[k];
+				}
+				
+				top->left->len = tok[i]->len;
+				top->left->type = tok[i]->type;
+			}
+			
 			// number
 			if(tok[i]->type == 4){
+				printf("bgng nr\n");
 				top = new_tkt_cell();
 				tt = top;
 				top->left = new_tkt_cell();
@@ -232,10 +263,9 @@ tk_tree* parser(int s_p, int f_p){
 			}
 			// operator
 			if(tok[i]->type == 3){
-				printf("op b\n");
-				printf("op b type %d: %c\n", top->type, top->chars[0]);
+				printf("bgng op\n");
 				
-				if(top->type == 3){
+				if(top->type == 3 || top->type == 2){
 					tk_tree* new_top = new_tkt_cell();
 					new_top->left = top;
 					top = new_top;
@@ -253,6 +283,7 @@ tk_tree* parser(int s_p, int f_p){
 			
 			// function
 			if(tok[i]->type == 2){
+				printf("bgng fnc\n");
 				top = new_tkt_cell();
 				tt = top;
 
@@ -261,7 +292,7 @@ tk_tree* parser(int s_p, int f_p){
 				
 				top->len = tok[i]->len;
 				top->type = tok[i]->type;
-				bgng = 0;		
+//				bgng = 0;		
 			}
 			continue;
 		}
@@ -317,8 +348,9 @@ tk_tree* parser(int s_p, int f_p){
 		
 		// function
 		if(tok[i]->type == 2){
+			printf("function\n");
 			tt->right = new_tkt_cell();
-			tt->right->right = new_tkt_cell();
+			//tt->right->right = new_tkt_cell();
 			
 			for(k = 0; k < tok[i]->len; k++)
 				tt->right->chars[k] = tok[i]->chars[k];
@@ -340,6 +372,13 @@ float compute(struct tk_tree* node)
 	if(node->type == 4)
 		return atof(node->chars);
 		
+	if(node->type == 5){
+		if(node->chars[0] == 'p' && node->chars[1] == 'i')
+			return 3.14159265;
+		else if(node->chars[0] == 'e')
+			return 2.71828182;
+	}	
+	
 	float l = 0; 
 	l = compute(node->left); 
 	
@@ -370,12 +409,8 @@ float compute(struct tk_tree* node)
 			result = cos(r);
 		else if(node->chars[0] == 'l' && node->chars[1] == 'o' && node->chars[2] == 'g')
 			result = log(r);
-		else if(node->chars[0] == 'p' && node->chars[1] == 'i')
-			result = 3.14159265;
-		else if(node->chars[0] == 'e')
-			result = 2.71828182;
 	}
-	
+	printf("RES: %f | l=%f, r=%f\n", result, l, r);
     return result;
 } 
 
