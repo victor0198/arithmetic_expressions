@@ -65,8 +65,6 @@ void split(char chs[1000], int len){
 			if(type != 5){
 				type = 5;
 				changed = 1;
-				printf("const\n");
-
 			}
 		}
 		// function
@@ -132,25 +130,6 @@ tk_tree* new_tkt_cell(){
 	return tkt;
 }
 
-void print_tree(struct tk_tree* node)
-{ 
-	if (node == NULL)
-	{
-		printf(".\n");
-		return;
-	}
-		
-	printf("L\n");
-	print_tree(node->left); 
-	printf("R\n");
-	print_tree(node->right);
-    
-    int  i;
-    for(i=0;i<node->len;i++)
-    printf("%c\n", node->chars[i]);
-	
-} 
-
 tk_tree* parser(int s_p, int f_p){
 	int i,  j, k, bgng = 1;
 	tk_tree* top = NULL;
@@ -159,36 +138,24 @@ tk_tree* parser(int s_p, int f_p){
 	if(f_p - s_p == 0){
 		top = new_tkt_cell();
 		
-		printf("\n\ndifference=0\n");
 		for(j = 0; j < tok[s_p]->len; j++){
 			top->chars[j] = tok[s_p]->chars[j];
-			printf("%c\n", top->chars[j]);
 		}
 		
 		top->len = tok[s_p]->len;
 		top->type = tok[s_p]->type;
 		
-		print_tree(top);
-		printf("\n\n");
 		return top;
 	}
 	
 	// parse an expression
 	for(i = s_p; i < f_p; i++){
-		printf("   ");
-		for(k = 0; k<tok[i]->len; k++){
-			printf("%c", tok[i]->chars[k]);
-		}
-		printf("\n");
-		
 		if(tok[i]->chars[0] == ')' && i == f_p-1)
 			continue;
 		else if(tok[i]->chars[0] == '('){
-			printf("1)yep\n");
 			j = i+1;
 			int counter = 1;
 			while(j < f_p-1 && counter != 0){
-				printf("counter = %d| %c\n", counter, tok[j]->chars[0]);
 				if(tok[j]->chars[0] == '(')
 					counter++;
 				if(tok[j]->chars[0] == ')')
@@ -200,44 +167,26 @@ tk_tree* parser(int s_p, int f_p){
 				j--;
 				
 			tk_tree* new_top;
-			printf("2)i %d j %d\n", i+1,j);
-			
-			printf("----P----\n");
 			new_top = parser(i+1, j);
-			print_tree(new_top);
-			printf("-----Pe----\n");
-			
-			printf("3)O\n");
 			i = j;
-			printf("4)K\n");
 			if(top == NULL){
-				
-				printf("5)NEW TOP\n");
 				top = new_top;
-				printf("6)NEW TOP - OK\n");
 			}
 			else if(top->right != NULL && top->right->right != NULL && top->right->right->type == 2){
-				printf("5)TOP->right->right\n");
 				top->right->right->right = new_top;
-				printf("6)TOP->right->right - OK\n");
 			}
 			else if(top->right != NULL && top->right->type == 2){
-				printf("5)TOP->right\n");
 				top->right->right = new_top;
-				printf("6)TOP->right - OK\n");
 			}
 			else
 				top->right = new_top;	
 			
-			printf("7)ok\n");
-//			bgng = 0;
 			continue;		
 		}
 		
 		if(bgng){
 			// constant
 			if(tok[i]->type == 5){
-				printf("bgng const\n");
 				top = new_tkt_cell();
 				top->left = new_tkt_cell();
 				
@@ -251,7 +200,6 @@ tk_tree* parser(int s_p, int f_p){
 			
 			// number
 			if(tok[i]->type == 4){
-				printf("bgng nr\n");
 				top = new_tkt_cell();
 				top->left = new_tkt_cell();
 				
@@ -264,8 +212,6 @@ tk_tree* parser(int s_p, int f_p){
 			}
 			// operator
 			if(tok[i]->type == 3){
-				printf("bgng op\n");
-				
 				if(top->type == 3 || top->type == 2){
 					tk_tree* new_top = new_tkt_cell();
 					new_top->left = top;
@@ -283,7 +229,6 @@ tk_tree* parser(int s_p, int f_p){
 			
 			// function
 			if(tok[i]->type == 2){
-				printf("bgng fnc\n");
 				top = new_tkt_cell();
 
 				for(k = 0; k < tok[i]->len; k++)
@@ -291,16 +236,13 @@ tk_tree* parser(int s_p, int f_p){
 				
 				top->len = tok[i]->len;
 				top->type = tok[i]->type;
-//				bgng = 0;		
 			}
 			continue;
 		}
 		
 		// number
 		if(tok[i]->type == 4 || tok[i]->type == 5){
-			printf("---num---\n");
 			if( (top->chars[0] == '+' || top->chars[0] == '-') && top->right != NULL &&(top->right->chars[0] == '*' || top->right->chars[0] == '/') ){
-				printf("way 1\n");
 				top->right->right = new_tkt_cell();
 				
 				for(k = 0; k < tok[i]->len; k++){
@@ -312,7 +254,6 @@ tk_tree* parser(int s_p, int f_p){
 			}
 			
 			else if(top->chars[0] == '+' || top->chars[0] == '-' || top->chars[0] == '-' || top->chars[0] == '/'){
-				printf("way 2\n");
 				top->right = new_tkt_cell();
 				
 				for(k = 0; k < tok[i]->len; k++){
@@ -322,26 +263,9 @@ tk_tree* parser(int s_p, int f_p){
 				top->right->len = tok[i]->len;
 				top->right->type = tok[i]->type;
 			}
-			/*
-			if(tt->chars[0] == '*' || tt->chars[0] == '/' || tt->type == 2){
-				tt->right = new_tkt_cell();
-				
-				for(k = 0; k < tok[i]->len; k++){
-					tt->right->chars[k] = tok[i]->chars[k];
-				}
-				
-				tt->right->len = tok[i]->len;
-				tt->right->type = tok[i]->type;
-			}*/
-			printf("---num ok---\n");
-			printf("---------\n");
-			print_tree(top);
-			printf("---------\n");
 		}
 		// operator
 		if(tok[i]->type == 3){
-			printf("operator\n");
-			
 			if( (top->chars[0] == '+' || top->chars[0] == '-') && (tok[i]->chars[0] == '*' || tok[i]->chars[0] == '/') ){
 				tk_tree* new_left = top->right;
 				top->right = new_tkt_cell();
@@ -359,26 +283,10 @@ tk_tree* parser(int s_p, int f_p){
 				new_top->left = top; 
 				top = new_top;
 			}
-			
-			/*if(){
-				tk_tree* new_left = tt->right;
-				tt->right = new_tkt_cell();
-				tt = tt->right;
-				tt->left = new_left;
-				
-				tt->chars[0] = tok[i]->chars[0];
-				tt->len = tok[i]->len;
-				tt->type = tok[i]->type;
-			}*/
-			printf("operator - ok\n");  
-			printf("---------\n");
-			print_tree(top);
-			printf("---------\n");
 		}
 		
 		// function
 		if(tok[i]->type == 2){
-			printf("function\n");
 			if( (top->chars[0] == '+' || top->chars[0] == '-') && top->right != NULL &&(top->right->chars[0] == '*' || top->right->chars[0] == '/') ){
 				top->right->right = new_tkt_cell();
 			
@@ -397,12 +305,8 @@ tk_tree* parser(int s_p, int f_p){
 				top->right->len = tok[i]->len;
 				top->right->type = tok[i]->type;
 			}
-			
-					
 		}
-		
 	}
-	printf("FIN\n");
 	return top;
 }
 
@@ -430,41 +334,28 @@ float compute(struct tk_tree* node)
     float result;
     if(node->type == 3){
     	if(node->chars[0] == '+')
-    		result = l + r;
+    		return l + r;
     		
     	if(node->chars[0] == '-')
-    		result = l - r;
+    		return l - r;
     	
     	if(node->chars[0] == '*')
-    		result = l * r;
+    		return l * r;
     		
     	if(node->chars[0] == '/')
-    		result = l / r;
-    	
-//    	printf("3\n");
-    	printf("RES: %f | l=%f, r=%f\n", result, l, r);
-		return result;
+    		return l / r;
 	}
 	
 	if(node->type == 2){
-		printf("type 2\n");
 		if(node->chars[0] == 's' && node->chars[1] == 'q' && node->chars[2] == 'r' && node->chars[3] == 't')
-			result = sqrt(r);
+			return sqrt(r);
 		else if(node->chars[0] == 's' && node->chars[1] == 'i' && node->chars[2] == 'n')
-			result = sin(r);
+			return sin(r);
 		else if(node->chars[0] == 'c' && node->chars[1] == 'o' && node->chars[2] == 's')
-			result = cos(r);
+			return cos(r);
 		else if(node->chars[0] == 'l' && node->chars[1] == 'o' && node->chars[2] == 'g')
-			result = log(r);
-		
-		printf("RES: %f | l=%f, r=%f\n", result, l, r);
-		return result;
+			return log(r);
 	}
-
-//	printf("5\n");
-	printf("RES: %f | l=%f, r=%f\n", l, l, r);
-	return l;
-    
 } 
 
 void output_f(char* ofname, float result){
@@ -473,27 +364,14 @@ void output_f(char* ofname, float result){
 	fclose(ofp);
 }
 
-void print_t(){
-	int i, j;
-	for(i=0;i<ti;i++){
-		for(j=0;j<tok[i]->len;j++)
-			printf("%c", tok[i]->chars[j]); 
-		printf("\n");
-	}
-}
-
 int main()
 {	
 	char* ifname = "ae.txt";
 	lexer(ifname);
-	print_t();
 	tk_tree* top;
 	top = parser(0, ti);
 	
-	print_tree(top);	
 	float result = compute(top);
-	
-	
 	
 	char* ofname = "result.txt";
 	output_f(ofname, result);
