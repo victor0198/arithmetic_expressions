@@ -1,1 +1,1 @@
-8/4/2
+sin(pi/2)  +  e*sin(pi/4)  +  sin(pi/6)*e  +  sin(pi/2)*sin(pi/4)
