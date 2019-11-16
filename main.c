@@ -298,7 +298,7 @@ tk_tree* parser(int s_p, int f_p){
 		}
 		
 		// number
-		if(tok[i]->type == 4){
+		if(tok[i]->type == 4 || tok[i]->type == 5){
 			if(tt->chars[0] == '+' || tt->chars[0] == '-'){
 				top->right = new_tkt_cell();
 				
@@ -398,6 +398,10 @@ float compute(struct tk_tree* node)
     		
     	if(node->chars[0] == '/')
     		result = l / r;
+    	
+//    	printf("3\n");
+    	printf("RES: %f | l=%f, r=%f\n", result, l, r);
+		return result;
 	}
 	
 	if(node->type == 2){
@@ -409,9 +413,16 @@ float compute(struct tk_tree* node)
 			result = cos(r);
 		else if(node->chars[0] == 'l' && node->chars[1] == 'o' && node->chars[2] == 'g')
 			result = log(r);
+		
+//		printf("2\n");
+		printf("RES: %f | l=%f, r=%f\n", result, l, r);
+		return result;
 	}
-	printf("RES: %f | l=%f, r=%f\n", result, l, r);
-    return result;
+
+//	printf("5\n");
+	printf("RES: %f | l=%f, r=%f\n", l, l, r);
+	return l;
+    
 } 
 
 void output_f(char* ofname, float result){
