@@ -335,36 +335,29 @@ float compute(struct tk_tree* node)
     float result;
     if(node->type == 3){
     	if(node->chars[0] == '+')
-    		result = l + r;
+    		return l + r;
     		
     	if(node->chars[0] == '-')
-    		result = l - r;
+    		return l - r;
     	
     	if(node->chars[0] == '*')
-    		result = l * r;
+    		return l * r;
     		
     	if(node->chars[0] == '/')
-    		result = l / r;
-    	
-    	printf("RES: %f | l=%f, r=%f\n", result, l, r);
-		return result;
+    		return l / r;
 	}
 	
 	if(node->type == 2){
 		if(node->chars[0] == 's' && node->chars[1] == 'q' && node->chars[2] == 'r' && node->chars[3] == 't')
-			result = sqrt(r);
+			return sqrt(r);
 		else if(node->chars[0] == 's' && node->chars[1] == 'i' && node->chars[2] == 'n')
-			result = sin(r);
+			return sin(r);
 		else if(node->chars[0] == 'c' && node->chars[1] == 'o' && node->chars[2] == 's')
-			result = cos(r);
+			return cos(r);
 		else if(node->chars[0] == 'l' && node->chars[1] == 'o' && node->chars[2] == 'g')
-			result = log(r);
-		
-		printf("RES: %f | l=%f, r=%f\n", result, l, r);
-		return result;
+			return log(r);
 	}
 
-	printf("RES: %f | l=%f, r=%f\n", l, l, r);
 	return l;
     
 } 
